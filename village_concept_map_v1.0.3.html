@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Village Relationships Concept Map</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
+            background: #f8f9fa;
+            border-radius: 20px;
+            border: 2px solid;
+        }
+        
+        .legend-family { border-color: #e74c3c; }
+        .legend-work { border-color: #3498db; }
+        .legend-social { border-color: #2ecc71; }
+        
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .map-container {
+            position: relative;
+            height: 600px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            overflow: hidden;
+        }
+        
+        .person {
+            position: absolute;
+            width: 120px;
+            height: 80px;
+            background: #fff;
+            border: 3px solid #34495e;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .person:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+        }
+        
+        .person-name {
+            font-weight: bold;
+            font-size: 0.9em;
+            color: #2c3e50;
+        }
+        
+        .person-role {
+            font-size: 0.75em;
+            color: #7f8c8d;
+            margin-top: 2px;
+        }
+        
+        .connection {
+            position: absolute;
+            height: 3px;
+            transform-origin: left center;
+            pointer-events: none;
+            opacity: 0.8;
+        }
+        
+        .family-connection { background: #e74c3c; }
+        .work-connection { background: #3498db; }
+        .social-connection { background: #2ecc71; }
+        
+        .connection-label {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.7em;
+            transform: translate(-50%, -50%);
+            white-space: nowrap;
+            border: 1px solid #ddd;
+        }
+        
+        .controls {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .filter-btn {
+            margin: 5px;
+            padding: 8px 16px;
+            border: 2px solid;
+            background: white;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+        
+        .filter-btn.active {
+            color: white;
+        }
+        
+        .filter-family { border-color: #e74c3c; }
+        .filter-family.active { background: #e74c3c; }
+        .filter-work { border-color: #3498db; }
+        .filter-work.active { background: #3498db; }
+        .filter-social { border-color: #2ecc71; }
+        .filter-social.active { background: #2ecc71; }
+        .filter-all { border-color: #34495e; }
+        .filter-all.active { background: #34495e; }
+        
+        .file-upload-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #3498db;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            text-decoration: none;
+            border: none;
+            font-size: 14px;
+            margin: 5px;
+        }
+        
+        .file-upload-btn:hover {
+            background: #2980b9;
+        }
+        
+        .file-upload-btn.reset-btn {
+            background: #e74c3c;
+        }
+        
+        .file-upload-btn.reset-btn:hover {
+            background: #c0392b;
+        }
+        
+        .upload-status {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+        }
+        
+        .upload-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .upload-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .upload-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .info-panel {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Village Community Network</h1>
+        <p class="subtitle">Exploring the interconnected relationships in a small village community</p>
+        
+        <div class="legend">
+            <div class="legend-item legend-family">
+                <div class="legend-dot" style="background: #e74c3c;"></div>
+                <span>Family Relationships</span>
+            </div>
+            <div class="legend-item legend-work">
+                <div class="legend-dot" style="background: #3498db;"></div>
+                <span>Work Relationships</span>
+            </div>
+            <div class="legend-item legend-social">
+                <div class="legend-dot" style="background: #2ecc71;"></div>
+                <span>Social Relationships</span>
+            </div>
+        </div>
+        
+        <div class="map-container" id="mapContainer">
+        </div>
+        
+        <div class="controls">
+            <button class="filter-btn filter-all active" onclick="filterConnections('all')">Show All</button>
+            <button class="filter-btn filter-family" onclick="filterConnections('family')">Family Only</button>
+            <button class="filter-btn filter-work" onclick="filterConnections('work')">Work Only</button>
+            <button class="filter-btn filter-social" onclick="filterConnections('social')">Social Only</button>
+        </div>
+        
+        <div class="file-controls" style="text-align: center; margin: 20px 0; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+            <h3 style="margin-top: 0; color: #2c3e50;">Import Your Data</h3>
+            <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
+                <label class="file-upload-btn">
+                    <input type="file" id="gedcomFile" accept=".ged" style="display: none;" onchange="handleGedcomUpload(event)">
+                    📁 Upload GEDCOM File
+                </label>
+                <label class="file-upload-btn">
+                    <input type="file" id="csvFile" accept=".csv" style="display: none;" onchange="handleCsvUpload(event)">
+                    📊 Upload CSV File
+                </label>
+                <button class="file-upload-btn" onclick="openDataEntryForm()">✏️ Open Data Entry Form</button>
+                <button class="file-upload-btn reset-btn" onclick="resetData()">🗑️ Reset Data</button>
+            </div>
+            <p style="color: #7f8c8d; font-size: 0.9em; margin-top: 10px;">
+                Upload your GEDCOM file for family relationships and CSV for social/work relationships
+            </p>
+        </div>
+        
+        <div class="info-panel">
+            <strong>How to use:</strong> Click the filter buttons above to focus on specific relationship types. Hover over people to see them highlighted. Upload your GEDCOM file for family data and CSV file for social/work relationships, or use the data entry form to capture information from newspaper clippings. Use the Reset Data button to clear all sample data before importing your own.
+        </div>
+        
+        <div id="uploadStatus" class="upload-status"></div>
+    </div>
+
+    <script>
+        // Initial people array with standardized IDs
+        const people = [
+            { id: 'mariasantos', name: 'Maria Santos', role: 'Village Mayor', x: 500, y: 50 },
+            { id: 'tombaker', name: 'Tom Baker', role: 'Village Baker', x: 200, y: 150 },
+            { id: 'annachen', name: 'Anna Chen', role: 'School Teacher', x: 700, y: 120 },
+            { id: 'johnmiller', name: 'John Miller', role: 'Farmer', x: 100, y: 300 },
+            { id: 'sarahmiller', name: 'Sarah Miller', role: 'Farmer', x: 250, y: 280 },
+            { id: 'drpatel', name: 'Dr. Patel', role: 'Village Doctor', x: 600, y: 250 },
+            { id: 'lisawong', name: 'Lisa Wong', role: 'General Store', x: 450, y: 200 },
+            { id: 'bobtaylor', name: 'Bob Taylor', role: 'Mechanic', x: 350, y: 350 },
+            { id: 'emmadavis', name: 'Emma Davis', role: 'Librarian', x: 800, y: 300 },
+            { id: 'carlosrodriguez', name: 'Carlos Rodriguez', role: 'Postman', x: 150, y: 450 },
+            { id: 'helentaylor', name: 'Helen Taylor', role: 'Village Nurse', x: 550, y: 400 },
+            { id: 'fatherobrien', name: 'Father O\'Brien', role: 'Village Priest', x: 750, y: 450 }
+        ];
+
+        // Initial connections array with standardized IDs
+        const connections = [
+            // Family relationships
+            { from: 'johnmiller', to: 'sarahmiller', type: 'family', label: 'Married' },
+            { from: 'bobtaylor', to: 'helentaylor', type: 'family', label: 'Married' },
+            { from: 'tombaker', to: 'annachen', type: 'family', label: 'Siblings' },
+            
+            // Work relationships
+            { from: 'mariasantos', to: 'drpatel', type: 'work', label: 'Healthcare Planning' },
+            { from: 'mariasantos', to: 'annachen', type: 'work', label: 'Education Board' },
+            { from: 'drpatel', to: 'helentaylor', type: 'work', label: 'Medical Team' },
+            { from: 'tombaker', to: 'lisawong', type: 'work', label: 'Supply Chain' },
+            { from: 'johnmiller', to: 'tombaker', type: 'work', label: 'Grain Supply' },
+            { from: 'sarahmiller', to: 'lisawong', type: 'work', label: 'Produce Supply' },
+            { from: 'carlosrodriguez', to: 'lisawong', type: 'work', label: 'Mail Delivery' },
+            { from: 'emmadavis', to: 'annachen', type: 'work', label: 'Education Resources' },
+            
+            // Social relationships
+            { from: 'fatherobrien', to: 'mariasantos', type: 'social', label: 'Community Events' },
+            { from: 'fatherobrien', to: 'tombaker', type: 'social', label: 'Church Committee' },
+            { from: 'emmadavis', to: 'drpatel', type: 'social', label: 'Book Club' },
+            { from: 'annachen', to: 'emmadavis', type: 'social', label: 'Book Club' },
+            { from: 'bobtaylor', to: 'johnmiller', type: 'social', label: 'Fishing Buddies' },
+            { from: 'lisawong', to: 'carlosrodriguez', type: 'social', label: 'Coffee Friends' },
+            { from: 'helentaylor', to: 'annachen', type: 'social', label: 'Garden Club' },
+            { from: 'mariasantos', to: 'fatherobrien', type: 'social', label: 'Community Planning' }
+        ];
+
+        function createPeople() {
+            const container = document.getElementById('mapContainer');
+            people.forEach(person => {
+                const personEl = document.createElement('div');
+                personEl.className = 'person';
+                personEl.id = person.id;
+                personEl.style.left = person.x + 'px';
+                personEl.style.top = person.y + 'px';
+                
+                personEl.innerHTML = `
+                    <div class="person-name">${person.name}</div>
+                    <div class="person-role">${person.role}</div>
+                `;
+
+                // --- DRAGGABLE FUNCTIONALITY START ---
+                let offsetX, offsetY, isDragging = false;
+
+                personEl.addEventListener('mousedown', function(e) {
+                    isDragging = true;
+                    // Calculate offset from top-left corner of the box
+                    offsetX = e.clientX - personEl.offsetLeft;
+                    offsetY = e.clientY - personEl.offsetTop;
+                    personEl.style.zIndex = 1000;
+                    document.body.style.userSelect = 'none';
+                });
+
+                document.addEventListener('mousemove', function moveHandler(e) {
+                    if (!isDragging) return;
+                    // Calculate new position
+                    let newX = e.clientX - offsetX;
+                    let newY = e.clientY - offsetY;
+                    // Keep within container bounds
+                    const containerRect = container.getBoundingClientRect();
+                    newX = Math.max(0, Math.min(newX, containerRect.width - personEl.offsetWidth));
+                    newY = Math.max(0, Math.min(newY, containerRect.height - personEl.offsetHeight));
+                    personEl.style.left = newX + 'px';
+                    personEl.style.top = newY + 'px';
+                });
+
+                document.addEventListener('mouseup', function upHandler(e) {
+                    if (!isDragging) return;
+                    isDragging = false;
+                    personEl.style.zIndex = '';
+                    document.body.style.userSelect = '';
+                    // Update the person's position in the people array
+                    const idx = people.findIndex(p => p.id === person.id);
+                    if (idx !== -1) {
+                        people[idx].x = parseInt(personEl.style.left);
+                        people[idx].y = parseInt(personEl.style.top);
+                    }
+                    // Redraw connections and labels
+                    refreshMap();
+                });
+                // --- DRAGGABLE FUNCTIONALITY END ---
+
+                container.appendChild(personEl);
+            });
+        }
+
+        function createConnections() {
+            const container = document.getElementById('mapContainer');
+            connections.forEach((conn, index) => {
+                const fromPerson = people.find(p => p.id === conn.from);
+                const toPerson = people.find(p => p.id === conn.to);
+                
+                if (!fromPerson || !toPerson) {
+                    console.warn(`Connection skipped: Could not find person for IDs '${conn.from}' or '${conn.to}'`);
+                    return;
+                }
+
+                const fromX = fromPerson.x + 60;
+                const fromY = fromPerson.y + 40;
+                const toX = toPerson.x + 60;
+                const toY = toPerson.y + 40;
+                
+                const distance = Math.sqrt(Math.pow(toX - fromX, 2) + Math.pow(toY - fromY, 2));
+                const angle = Math.atan2(toY - fromY, toX - fromX) * 180 / Math.PI;
+                
+                const connectionEl = document.createElement('div');
+                connectionEl.className = `connection ${conn.type}-connection`;
+                connectionEl.style.left = fromX + 'px';
+                connectionEl.style.top = fromY + 'px';
+                connectionEl.style.width = distance + 'px';
+                connectionEl.style.transform = `rotate(${angle}deg)`;
+                connectionEl.dataset.type = conn.type;
+                
+                const labelEl = document.createElement('div');
+                labelEl.className = 'connection-label';
+                labelEl.textContent = conn.label;
+                labelEl.style.left = (fromX + (toX - fromX) / 2) + 'px';
+                labelEl.style.top = (fromY + (toY - fromY) / 2) + 'px';
+                labelEl.dataset.type = conn.type;
+                
+                container.appendChild(connectionEl);
+                container.appendChild(labelEl);
+            });
+        }
+
+        function filterConnections(type) {
+            // Update button states
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`.filter-${type}`).classList.add('active');
+            
+            // Show/hide connections
+            document.querySelectorAll('.connection, .connection-label').forEach(el => {
+                if (type === 'all' || el.dataset.type === type) {
+                    el.style.display = 'block';
+                } else {
+                    el.style.display = 'none';
+                }
+            });
+        }
+
+        // File handling functions
+        function handleGedcomUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            showUploadStatus('Processing GEDCOM file...', 'info');
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const gedcomContent = e.target.result;
+                    parseGedcomData(gedcomContent);
+                    showUploadStatus('GEDCOM file loaded successfully!', 'success');
+                } catch (error) {
+                    showUploadStatus('Error processing GEDCOM file: ' + error.message, 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function handleCsvUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            showUploadStatus('Processing CSV file...', 'info');
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const csvContent = e.target.result;
+                    parseCsvData(csvContent);
+                    showUploadStatus('CSV file loaded successfully!', 'success');
+                } catch (error) {
+                    showUploadStatus('Error processing CSV file: ' + error.message, 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function parseGedcomData(gedcomContent) {
+            const lines = gedcomContent.split('\n');
+            const individuals = {};
+            const families = {};
+            
+            let currentRecord = null;
+            let currentType = null;
+            
+            lines.forEach(line => {
+                const parts = line.trim().split(' ');
+                const level = parseInt(parts[0]);
+                
+                if (level === 0 && parts[2] === 'INDI') {
+                    currentRecord = parts[1].replace(/@/g, '');
+                    currentType = 'INDI';
+                    individuals[currentRecord] = { id: currentRecord };
+                } else if (level === 0 && parts[2] === 'FAM') {
+                    currentRecord = parts[1].replace(/@/g, '');
+                    currentType = 'FAM';
+                    families[currentRecord] = { id: currentRecord };
+                } else if (level === 1 && currentRecord) {
+                    const tag = parts[1];
+                    const value = parts.slice(2).join(' ').replace(/@/g, '');
+                    
+                    if (currentType === 'INDI') {
+                        if (tag === 'NAME') {
+                            individuals[currentRecord].name = value.replace(/\//g, '');
+                        } else if (tag === 'OCCU') {
+                            individuals[currentRecord].occupation = value;
+                        }
+                    } else if (currentType === 'FAM') {
+                        if (tag === 'HUSB') {
+                            families[currentRecord].husband = value;
+                        } else if (tag === 'WIFE') {
+                            families[currentRecord].wife = value;
+                        } else if (tag === 'CHIL') {
+                            if (!families[currentRecord].children) {
+                                families[currentRecord].children = [];
+                            }
+                            families[currentRecord].children.push(value);
+                        }
+                    }
+                }
+            });
+            
+            addGedcomDataToMap(individuals, families);
+        }
+
+        function parseCsvData(csvContent) {
+            const lines = csvContent.split('\n');
+            const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+            
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''));
+                if (values.length >= 4 && values[0] && values[1]) {
+                    const person1Name = values[0];
+                    const person2Name = values[1];
+
+                    addPersonIfNotExists(person1Name, 'Unknown Role');
+                    addPersonIfNotExists(person2Name, 'Unknown Role');
+
+                    const person1Id = person1Name.toLowerCase().replace(/[^a-z0-9]/g, '');
+                    const person2Id = person2Name.toLowerCase().replace(/[^a-z0-9]/g, '');
+                    
+                    const relationship = {
+                        from: person1Id,
+                        to: person2Id,
+                        type: values[3] || 'social',
+                        label: values[2] || 'connection',
+                        source: values[5] || 'CSV import'
+                    };
+                    
+                    connections.push(relationship);
+                }
+            }
+            
+            refreshMap();
+        }
+
+        function addGedcomDataToMap(individuals, families) {
+            Object.values(individuals).forEach(person => {
+                if (person.name) {
+                    addPersonIfNotExists(person.name, person.occupation || 'Unknown Role');
+                }
+            });
+            
+            Object.values(families).forEach(family => {
+                if (family.husband && family.wife) {
+                    const husband = individuals[family.husband];
+                    const wife = individuals[family.wife];
+                    if (husband && wife && husband.name && wife.name) {
+                        const husbandId = husband.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+                        const wifeId = wife.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+                        connections.push({
+                            from: husbandId,
+                            to: wifeId,
+                            type: 'family',
+                            label: 'Married'
+                        });
+                    }
+                }
+                
+                if (family.children) {
+                    family.children.forEach(childId => {
+                        const child = individuals[childId];
+                        if (child && child.name) {
+                            const childCleanId = child.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+                            if (family.husband) {
+                                const father = individuals[family.husband];
+                                if (father && father.name) {
+                                    const fatherCleanId = father.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+                                    connections.push({
+                                        from: fatherCleanId,
+                                        to: childCleanId,
+                                        type: 'family',
+                                        label: 'Parent-Child'
+                                    });
+                                }
+                            }
+                            if (family.wife) {
+                                const mother = individuals[family.wife];
+                                if (mother && mother.name) {
+                                    const motherCleanId = mother.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+                                    connections.push({
+                                        from: motherCleanId,
+                                        to: childCleanId,
+                                        type: 'family',
+                                        label: 'Parent-Child'
+                                    });
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+            
+            refreshMap();
+        }
+
+        function addPersonIfNotExists(name, role) {
+            const id = name.toLowerCase().replace(/[^a-z0-9]/g, '');
+            if (!people.find(p => p.id === id)) {
+                people.push({
+                    id: id,
+                    name: name,
+                    role: role,
+                    x: Math.random() * 800 + 100,
+                    y: Math.random() * 400 + 100
+                });
+            }
+        }
+
+        function refreshMap() {
+            document.getElementById('mapContainer').innerHTML = '';
+            createPeople();
+            createConnections();
+        }
+
+        function showUploadStatus(message, type) {
+            const statusDiv = document.getElementById('uploadStatus');
+            statusDiv.textContent = message;
+            statusDiv.className = `upload-status upload-${type}`;
+            statusDiv.style.display = 'block';
+            
+            // Auto-hide after 5 seconds for success messages
+            if (type === 'success') {
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        function openDataEntryForm() {
+            // Simple form for adding relationships manually
+            const name1 = prompt("Enter first person's name:");
+            if (!name1) return;
+            
+            const name2 = prompt("Enter second person's name:");
+            if (!name2) return;
+            
+            const relationshipType = prompt("Enter relationship type (e.g., 'Married', 'Friends', 'Coworkers'):");
+            if (!relationshipType) return;
+            
+            const category = prompt("Enter category (family, work, or social):") || 'social';
+            
+            // Add people if they don't exist
+            addPersonIfNotExists(name1, 'Unknown Role');
+            addPersonIfNotExists(name2, 'Unknown Role');
+            
+            // Create connection
+            const person1Id = name1.toLowerCase().replace(/[^a-z0-9]/g, '');
+            const person2Id = name2.toLowerCase().replace(/[^a-z0-9]/g, '');
+            
+            connections.push({
+                from: person1Id,
+                to: person2Id,
+                type: category,
+                label: relationshipType
+            });
+            
+            refreshMap();
+            showUploadStatus(`Added relationship: ${name1} - ${name2} (${relationshipType})`, 'success');
+        }
+
+        function resetData() {
+            // Confirm before resetting
+            if (confirm('Are you sure you want to clear all current data? This will remove all people and relationships from the map.')) {
+                // Clear the arrays
+                people.length = 0;
+                connections.length = 0;
+                
+                // Clear the map display
+                document.getElementById('mapContainer').innerHTML = '';
+                
+                // Reset filter to show all
+                filterConnections('all');
+                
+                // Show status message
+                showUploadStatus('All data cleared. Ready for new data import.', 'success');
+            }
+        }
+
+        // Initialize the map when page loads
+        window.addEventListener('load', function() {
+            createPeople();
+            createConnections();
+        });
+    </script>
+</body>
+</html>
