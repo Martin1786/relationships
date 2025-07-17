@@ -1,0 +1,204 @@
+{
+  "people": [
+    {
+      "id": "mariasantos",
+      "name": "Maria Santos",
+      "role": "Village Mayor",
+      "x": 1018,
+      "y": 22
+    },
+    {
+      "id": "tombaker",
+      "name": "Tom Baker",
+      "role": "Village Baker",
+      "x": 200,
+      "y": 150
+    },
+    {
+      "id": "annachen",
+      "name": "Anna Chen",
+      "role": "School Teacher",
+      "x": 700,
+      "y": 120
+    },
+    {
+      "id": "johnmiller",
+      "name": "John Miller",
+      "role": "Farmer",
+      "x": 100,
+      "y": 300
+    },
+    {
+      "id": "sarahmiller",
+      "name": "Sarah Miller",
+      "role": "Farmer",
+      "x": 250,
+      "y": 280
+    },
+    {
+      "id": "drpatel",
+      "name": "Dr. Patel",
+      "role": "Village Doctor",
+      "x": 600,
+      "y": 250
+    },
+    {
+      "id": "lisawong",
+      "name": "Lisa Wong",
+      "role": "General Store",
+      "x": 450,
+      "y": 200
+    },
+    {
+      "id": "bobtaylor",
+      "name": "Bob Taylor",
+      "role": "Mechanic",
+      "x": 350,
+      "y": 350
+    },
+    {
+      "id": "emmadavis",
+      "name": "Emma Davis",
+      "role": "Librarian",
+      "x": 800,
+      "y": 300
+    },
+    {
+      "id": "carlosrodriguez",
+      "name": "Carlos Rodriguez",
+      "role": "Postman",
+      "x": 150,
+      "y": 450
+    },
+    {
+      "id": "helentaylor",
+      "name": "Helen Taylor",
+      "role": "Village Nurse",
+      "x": 550,
+      "y": 400
+    },
+    {
+      "id": "fatherobrien",
+      "name": "Father O'Brien",
+      "role": "Village Priest",
+      "x": 750,
+      "y": 450
+    }
+  ],
+  "connections": [
+    {
+      "from": "johnmiller",
+      "to": "sarahmiller",
+      "type": "family",
+      "label": "Married"
+    },
+    {
+      "from": "bobtaylor",
+      "to": "helentaylor",
+      "type": "family",
+      "label": "Married"
+    },
+    {
+      "from": "tombaker",
+      "to": "annachen",
+      "type": "family",
+      "label": "Siblings"
+    },
+    {
+      "from": "mariasantos",
+      "to": "drpatel",
+      "type": "work",
+      "label": "Healthcare Planning"
+    },
+    {
+      "from": "mariasantos",
+      "to": "annachen",
+      "type": "work",
+      "label": "Education Board"
+    },
+    {
+      "from": "drpatel",
+      "to": "helentaylor",
+      "type": "work",
+      "label": "Medical Team"
+    },
+    {
+      "from": "tombaker",
+      "to": "lisawong",
+      "type": "work",
+      "label": "Supply Chain"
+    },
+    {
+      "from": "johnmiller",
+      "to": "tombaker",
+      "type": "work",
+      "label": "Grain Supply"
+    },
+    {
+      "from": "sarahmiller",
+      "to": "lisawong",
+      "type": "work",
+      "label": "Produce Supply"
+    },
+    {
+      "from": "carlosrodriguez",
+      "to": "lisawong",
+      "type": "work",
+      "label": "Mail Delivery"
+    },
+    {
+      "from": "emmadavis",
+      "to": "annachen",
+      "type": "work",
+      "label": "Education Resources"
+    },
+    {
+      "from": "fatherobrien",
+      "to": "mariasantos",
+      "type": "social",
+      "label": "Community Events"
+    },
+    {
+      "from": "fatherobrien",
+      "to": "tombaker",
+      "type": "social",
+      "label": "Church Committee"
+    },
+    {
+      "from": "emmadavis",
+      "to": "drpatel",
+      "type": "social",
+      "label": "Book Club"
+    },
+    {
+      "from": "annachen",
+      "to": "emmadavis",
+      "type": "social",
+      "label": "Book Club"
+    },
+    {
+      "from": "bobtaylor",
+      "to": "johnmiller",
+      "type": "social",
+      "label": "Fishing Buddies"
+    },
+    {
+      "from": "lisawong",
+      "to": "carlosrodriguez",
+      "type": "social",
+      "label": "Coffee Friends"
+    },
+    {
+      "from": "helentaylor",
+      "to": "annachen",
+      "type": "social",
+      "label": "Garden Club"
+    },
+    {
+      "from": "mariasantos",
+      "to": "fatherobrien",
+      "type": "social",
+      "label": "Community Planning"
+    }
+  ]
+}

@@ -247,6 +247,7 @@
             <button class="filter-btn filter-family" onclick="filterConnections('family')">Family Only</button>
             <button class="filter-btn filter-work" onclick="filterConnections('work')">Work Only</button>
             <button class="filter-btn filter-social" onclick="filterConnections('social')">Social Only</button>
+            <button class="file-upload-btn" onclick="downloadMapAsJSON()">⬇️ Download Map as JSON</button>
         </div>
         
         <div class="file-controls" style="text-align: center; margin: 20px 0; padding: 20px; background: #f8f9fa; border-radius: 8px;">
@@ -692,6 +693,24 @@
                 // Show status message
                 showUploadStatus('All data cleared. Ready for new data import.', 'success');
             }
+        }
+
+        // --- DOWNLOAD MAP AS JSON FUNCTION ---
+        function downloadMapAsJSON() {
+            const data = {
+                people: people,
+                connections: connections
+            };
+            const jsonStr = JSON.stringify(data, null, 2);
+            const blob = new Blob([jsonStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'village_map.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
 
         // Initialize the map when page loads
