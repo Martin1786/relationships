@@ -248,6 +248,7 @@
             <button class="filter-btn filter-work" onclick="filterConnections('work')">Work Only</button>
             <button class="filter-btn filter-social" onclick="filterConnections('social')">Social Only</button>
             <button class="file-upload-btn" onclick="downloadMapAsJSON()">⬇️ Download Map as JSON</button>
+            <button class="file-upload-btn" onclick="openAddRelationshipModal()">➕ Add Relationship</button>
         </div>
         
         <div class="file-controls" style="text-align: center; margin: 20px 0; padding: 20px; background: #f8f9fa; border-radius: 8px;">
@@ -285,6 +286,46 @@
           <div style="text-align:right;">
             <button type="button" id="cancelEditPerson" style="margin-right:10px;">Cancel</button>
             <button type="submit">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="editConnectionModal" style="display:none; position:fixed; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.3); z-index:2000; align-items:center; justify-content:center;">
+      <div style="background:#fff; padding:24px 32px; border-radius:10px; min-width:340px; box-shadow:0 8px 32px rgba(0,0,0,0.2); position:relative;">
+        <h3>Edit Relationship</h3>
+        <form id="editConnectionForm">
+          <label>Type/Label:<br><input type="text" id="editConnLabel" placeholder="Relationship type (e.g. Friends, Married)" style="width:100%; margin-bottom:10px;"></label><br>
+          <label>Category:<br><input type="text" id="editConnType" placeholder="family, work, or social" style="width:100%; margin-bottom:10px;"></label><br>
+          <label>Source Type:<br><input type="text" id="editConnSourceType" placeholder="Source type (e.g. Interview)" style="width:100%; margin-bottom:10px;"></label><br>
+          <label>Source Details:<br><input type="text" id="editConnSourceDetails" placeholder="Source details (e.g. Conversation notes)" style="width:100%; margin-bottom:10px;"></label><br>
+          <label>Date:<br><input type="text" id="editConnDate" placeholder="Date (e.g. 2025-06-01)" style="width:100%; margin-bottom:10px;"></label><br>
+          <label>Location:<br><input type="text" id="editConnLocation" placeholder="Location (e.g. London)" style="width:100%; margin-bottom:10px;"></label><br>
+          <label>Notes:<br><input type="text" id="editConnNotes" placeholder="Notes" style="width:100%; margin-bottom:10px;"></label><br>
+          <div style="text-align:right;">
+            <button type="button" id="cancelEditConnection" style="margin-right:10px;">Cancel</button>
+            <button type="submit">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="addRelationshipModal" style="display:none; position:fixed; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.3); z-index:2000; align-items:center; justify-content:center;">
+      <div style="background:#fff; padding:24px 32px; border-radius:10px; min-width:340px; box-shadow:0 8px 32px rgba(0,0,0,0.2); position:relative;">
+        <h3>Add Relationship</h3>
+        <form id="addRelationshipForm">
+          <label>Person 1:<br><select id="addRelPerson1" style="width:100%; margin-bottom:10px;"></select></label><br>
+          <label>Person 2:<br><select id="addRelPerson2" style="width:100%; margin-bottom:10px;"></select></label><br>
+          <label>Type/Label:<br><input type="text" id="addRelLabel" placeholder="Relationship type (e.g. Friends, Married)" style="width:100%; margin-bottom:10px;"></label><br>
+          <label>Category:<br><input type="text" id="addRelType" placeholder="family, work, or social" style="width:100%; margin-bottom:10px;"></label><br>
+          <label>Source Type:<br><input type="text" id="addRelSourceType" placeholder="Source type (e.g. Interview)" style="width:100%; margin-bottom:10px;"></label><br>
+          <label>Source Details:<br><input type="text" id="addRelSourceDetails" placeholder="Source details (e.g. Conversation notes)" style="width:100%; margin-bottom:10px;"></label><br>
+          <label>Date:<br><input type="text" id="addRelDate" placeholder="Date (e.g. 2025-06-01)" style="width:100%; margin-bottom:10px;"></label><br>
+          <label>Location:<br><input type="text" id="addRelLocation" placeholder="Location (e.g. London)" style="width:100%; margin-bottom:10px;"></label><br>
+          <label>Notes:<br><input type="text" id="addRelNotes" placeholder="Notes" style="width:100%; margin-bottom:10px;"></label><br>
+          <div style="text-align:right;">
+            <button type="button" id="cancelAddRelationship" style="margin-right:10px;">Cancel</button>
+            <button type="submit">Add</button>
           </div>
         </form>
       </div>
@@ -434,6 +475,13 @@
                 labelEl.style.left = (fromX + (toX - fromX) / 2) + 'px';
                 labelEl.style.top = (fromY + (toY - fromY) / 2) + 'px';
                 labelEl.dataset.type = conn.type;
+
+                // --- RIGHT-CLICK EDIT CONNECTION MODAL ---
+                labelEl.addEventListener('contextmenu', function(e) {
+                    e.preventDefault();
+                    openEditConnectionModal(index);
+                });
+                // --- END RIGHT-CLICK EDIT CONNECTION MODAL ---
                 
                 container.appendChild(connectionEl);
                 container.appendChild(labelEl);
@@ -825,6 +873,18 @@
             reader.readAsText(file);
         }
 
+        // --- UK DATE VALIDATION FUNCTION ---
+        function isValidUKDate(dateStr) {
+            if (!dateStr) return true; // Allow empty
+            // Match DD/MM/YYYY or D/M/YYYY
+            const regex = /^([0-2]?\d|3[01])\/(0?\d|1[0-2])\/\d{4}$/;
+            if (!regex.test(dateStr)) return false;
+            // Further check for valid day/month
+            const [day, month, year] = dateStr.split('/').map(Number);
+            const d = new Date(year, month - 1, day);
+            return d.getFullYear() === year && d.getMonth() === month - 1 && d.getDate() === day;
+        }
+
         // --- EDIT PERSON MODAL LOGIC ---
         let editingPersonId = null;
         function openEditPersonModal(personId) {
@@ -857,6 +917,113 @@
             document.getElementById('editPersonModal').style.display = 'none';
             editingPersonId = null;
             refreshMap();
+        };
+
+        // --- EDIT CONNECTION MODAL LOGIC ---
+        let editingConnectionIndex = null;
+        function openEditConnectionModal(connIndex) {
+            const modal = document.getElementById('editConnectionModal');
+            const form = document.getElementById('editConnectionForm');
+            const conn = connections[connIndex];
+            if (!conn) return;
+            editingConnectionIndex = connIndex;
+            document.getElementById('editConnLabel').value = conn.label || '';
+            document.getElementById('editConnType').value = conn.type || '';
+            document.getElementById('editConnSourceType').value = conn.source_type || '';
+            document.getElementById('editConnSourceDetails').value = conn.source_details || '';
+            document.getElementById('editConnDate').value = conn.date || '';
+            document.getElementById('editConnLocation').value = conn.location || '';
+            document.getElementById('editConnNotes').value = conn.notes || '';
+            modal.style.display = 'flex';
+            document.getElementById('editConnLabel').focus();
+        }
+        document.getElementById('cancelEditConnection').onclick = function() {
+            document.getElementById('editConnectionModal').style.display = 'none';
+            editingConnectionIndex = null;
+        };
+        document.getElementById('editConnectionForm').onsubmit = function(e) {
+            e.preventDefault();
+            const date = document.getElementById('editConnDate').value.trim();
+            if (!isValidUKDate(date)) {
+                alert('Please enter a valid date in DD/MM/YYYY format.');
+                document.getElementById('editConnDate').focus();
+                return;
+            }
+            if (editingConnectionIndex === null) return;
+            const conn = connections[editingConnectionIndex];
+            if (!conn) return;
+            conn.label = document.getElementById('editConnLabel').value.trim();
+            conn.type = document.getElementById('editConnType').value.trim();
+            conn.source_type = document.getElementById('editConnSourceType').value.trim();
+            conn.source_details = document.getElementById('editConnSourceDetails').value.trim();
+            conn.date = date;
+            conn.location = document.getElementById('editConnLocation').value.trim();
+            conn.notes = document.getElementById('editConnNotes').value.trim();
+            document.getElementById('editConnectionModal').style.display = 'none';
+            editingConnectionIndex = null;
+            refreshMap();
+        };
+
+        // --- ADD RELATIONSHIP MODAL LOGIC ---
+        function openAddRelationshipModal() {
+            const modal = document.getElementById('addRelationshipModal');
+            const person1Select = document.getElementById('addRelPerson1');
+            const person2Select = document.getElementById('addRelPerson2');
+            // Populate dropdowns
+            person1Select.innerHTML = '';
+            person2Select.innerHTML = '';
+            people.forEach(p => {
+                const opt1 = document.createElement('option');
+                opt1.value = p.id;
+                opt1.textContent = p.name;
+                person1Select.appendChild(opt1);
+                const opt2 = document.createElement('option');
+                opt2.value = p.id;
+                opt2.textContent = p.name;
+                person2Select.appendChild(opt2);
+            });
+            // Reset fields
+            document.getElementById('addRelLabel').value = '';
+            document.getElementById('addRelType').value = '';
+            document.getElementById('addRelSourceType').value = '';
+            document.getElementById('addRelSourceDetails').value = '';
+            document.getElementById('addRelDate').value = '';
+            document.getElementById('addRelLocation').value = '';
+            document.getElementById('addRelNotes').value = '';
+            modal.style.display = 'flex';
+            person1Select.focus();
+        }
+        document.getElementById('cancelAddRelationship').onclick = function() {
+            document.getElementById('addRelationshipModal').style.display = 'none';
+        };
+        document.getElementById('addRelationshipForm').onsubmit = function(e) {
+            e.preventDefault();
+            const date = document.getElementById('addRelDate').value.trim();
+            if (!isValidUKDate(date)) {
+                alert('Please enter a valid date in DD/MM/YYYY format.');
+                document.getElementById('addRelDate').focus();
+                return;
+            }
+            const from = document.getElementById('addRelPerson1').value;
+            const to = document.getElementById('addRelPerson2').value;
+            let type = document.getElementById('addRelType').value.trim().toLowerCase();
+            if (!["family", "work", "social"].includes(type)) {
+                type = "social";
+            }
+            connections.push({
+                from: from,
+                to: to,
+                type: type,
+                label: document.getElementById('addRelLabel').value.trim(),
+                source_type: document.getElementById('addRelSourceType').value.trim(),
+                source_details: document.getElementById('addRelSourceDetails').value.trim(),
+                date: date,
+                location: document.getElementById('addRelLocation').value.trim(),
+                notes: document.getElementById('addRelNotes').value.trim()
+            });
+            document.getElementById('addRelationshipModal').style.display = 'none';
+            refreshMap();
+            showUploadStatus('Relationship added!', 'success');
         };
 
         // Initialize the map when page loads

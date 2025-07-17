@@ -18,8 +18,8 @@
       "id": "annachen",
       "name": "Anna Chen",
       "role": "School Teacher",
-      "x": 700,
-      "y": 120
+      "x": 741,
+      "y": 0
     },
     {
       "id": "johnmiller",
@@ -39,29 +39,29 @@
       "id": "drpatel",
       "name": "Dr. Patel",
       "role": "Village Doctor",
-      "x": 600,
-      "y": 250
+      "x": 974,
+      "y": 339
     },
     {
       "id": "lisawong",
       "name": "Lisa Wong",
       "role": "General Store",
-      "x": 837,
-      "y": 89
+      "x": 314,
+      "y": 41
     },
     {
       "id": "bobtaylor",
       "name": "Bob Taylor",
       "role": "Mechanic",
-      "x": 350,
-      "y": 350
+      "x": 385,
+      "y": 477
     },
     {
       "id": "emmadavis",
       "name": "Emma Davis",
       "role": "Librarian",
-      "x": 800,
-      "y": 300
+      "x": 1048,
+      "y": 6
     },
     {
       "id": "carlosrodriguez",
@@ -74,8 +74,8 @@
       "id": "helentaylor",
       "name": "Helen Taylor",
       "role": "Village Nurse",
-      "x": 550,
-      "y": 400
+      "x": 558,
+      "y": 472
     },
     {
       "id": "fatherobrien",
@@ -88,15 +88,15 @@
       "id": "david",
       "name": "David",
       "role": "Unknown Role",
-      "x": 999,
-      "y": 167
+      "x": 822,
+      "y": 285
     },
     {
       "id": "goliath",
       "name": "Goliath",
       "role": "Unknown Role",
-      "x": 1002,
-      "y": 371
+      "x": 891,
+      "y": 147
     }
   ],
   "connections": [
@@ -250,8 +250,8 @@
       "relationship_category": "social",
       "source_type": "",
       "source_details": "",
-      "date": "",
-      "location": "",
+      "date": "25/08/2025",
+      "location": "Brussels",
       "notes": ""
     },
     {
@@ -314,10 +314,21 @@
       "person2_name": "Goliath",
       "relationship_type": "Friends",
       "relationship_category": "social",
+      "source_type": "Interview",
+      "source_details": "Interview research",
+      "date": "25/08/2027",
+      "location": "Plains of Sodom",
+      "notes": ""
+    },
+    {
+      "person1_name": "Goliath",
+      "person2_name": "Emma Davis",
+      "relationship_type": "Co-worker",
+      "relationship_category": "work",
       "source_type": "",
       "source_details": "",
-      "date": "",
-      "location": "",
+      "date": "24/07/2024",
+      "location": "London",
       "notes": ""
     }
   ]
