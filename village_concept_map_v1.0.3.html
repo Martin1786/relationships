@@ -258,8 +258,8 @@
                     📁 Upload GEDCOM File
                 </label>
                 <label class="file-upload-btn">
-                    <input type="file" id="csvFile" accept=".csv" style="display: none;" onchange="handleCsvUpload(event)">
-                    📊 Upload CSV File
+                    <input type="file" id="jsonFile" accept=".json" style="display: none;" onchange="handleJsonUpload(event)">
+                    🗂️ Upload JSON File
                 </label>
                 <button class="file-upload-btn" onclick="openDataEntryForm()">✏️ Open Data Entry Form</button>
                 <button class="file-upload-btn reset-btn" onclick="resetData()">🗑️ Reset Data</button>
@@ -274,6 +274,20 @@
         </div>
         
         <div id="uploadStatus" class="upload-status"></div>
+    </div>
+
+    <div id="editPersonModal" style="display:none; position:fixed; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.3); z-index:2000; align-items:center; justify-content:center;">
+      <div style="background:#fff; padding:24px 32px; border-radius:10px; min-width:300px; box-shadow:0 8px 32px rgba(0,0,0,0.2); position:relative;">
+        <h3>Edit Person</h3>
+        <form id="editPersonForm">
+          <label>Name:<br><input type="text" id="editPersonName" style="width:100%; margin-bottom:10px;"></label><br>
+          <label>Role:<br><input type="text" id="editPersonRole" style="width:100%; margin-bottom:10px;"></label><br>
+          <div style="text-align:right;">
+            <button type="button" id="cancelEditPerson" style="margin-right:10px;">Cancel</button>
+            <button type="submit">Save</button>
+          </div>
+        </form>
+      </div>
     </div>
 
     <script>
@@ -375,6 +389,13 @@
                     refreshMap();
                 });
                 // --- DRAGGABLE FUNCTIONALITY END ---
+
+                // --- RIGHT-CLICK EDIT MODAL ---
+                personEl.addEventListener('contextmenu', function(e) {
+                    e.preventDefault();
+                    openEditPersonModal(person.id);
+                });
+                // --- END RIGHT-CLICK EDIT MODAL ---
 
                 container.appendChild(personEl);
             });
@@ -656,21 +677,31 @@
             const relationshipType = prompt("Enter relationship type (e.g., 'Married', 'Friends', 'Coworkers'):");
             if (!relationshipType) return;
             
-            const category = prompt("Enter category (family, work, or social):") || 'social';
+            let category = prompt("Enter category (family, work, or social):") || 'social';
+            category = category.trim().toLowerCase();
+            if (!["family", "work", "social"].includes(category)) {
+                category = "social";
+            }
             
             // Add people if they don't exist
             addPersonIfNotExists(name1, 'Unknown Role');
             addPersonIfNotExists(name2, 'Unknown Role');
             
-            // Create connection
+            // Generate IDs consistently
             const person1Id = name1.toLowerCase().replace(/[^a-z0-9]/g, '');
             const person2Id = name2.toLowerCase().replace(/[^a-z0-9]/g, '');
             
+            // Create connection in internal format
             connections.push({
                 from: person1Id,
                 to: person2Id,
                 type: category,
-                label: relationshipType
+                label: relationshipType,
+                source_type: '',
+                source_details: '',
+                date: '',
+                location: '',
+                notes: ''
             });
             
             refreshMap();
@@ -697,9 +728,25 @@
 
         // --- DOWNLOAD MAP AS JSON FUNCTION ---
         function downloadMapAsJSON() {
+            // Map connections to the new format
+            const formattedConnections = connections.map(conn => {
+                const person1 = people.find(p => p.id === conn.from) || {};
+                const person2 = people.find(p => p.id === conn.to) || {};
+                return {
+                    person1_name: person1.name || '',
+                    person2_name: person2.name || '',
+                    relationship_type: conn.label || '',
+                    relationship_category: conn.type || '',
+                    source_type: conn.source_type || '',
+                    source_details: conn.source_details || '',
+                    date: conn.date || '',
+                    location: conn.location || '',
+                    notes: conn.notes || ''
+                };
+            });
             const data = {
                 people: people,
-                connections: connections
+                connections: formattedConnections
             };
             const jsonStr = JSON.stringify(data, null, 2);
             const blob = new Blob([jsonStr], { type: 'application/json' });
@@ -712,6 +759,105 @@
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
         }
+
+        // --- HANDLE JSON UPLOAD FUNCTION ---
+        function handleJsonUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            showUploadStatus('Processing JSON file...', 'info');
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const jsonData = JSON.parse(e.target.result);
+                    if (jsonData.people && jsonData.connections) {
+                        // Replace current data
+                        people.length = 0;
+                        connections.length = 0;
+                        jsonData.people.forEach(p => people.push({...p}));
+                        // Detect and convert CSV-style connections if needed
+                        jsonData.connections.forEach(c => {
+                            if (c.person1_name && c.person2_name) {
+                                // Find or create person1
+                                let person1 = people.find(p => p.name === c.person1_name);
+                                if (!person1) {
+                                    person1 = {
+                                        id: c.person1_name.toLowerCase().replace(/[^a-z0-9]/g, ''),
+                                        name: c.person1_name,
+                                        role: '', x: 100, y: 100
+                                    };
+                                    people.push(person1);
+                                }
+                                // Find or create person2
+                                let person2 = people.find(p => p.name === c.person2_name);
+                                if (!person2) {
+                                    person2 = {
+                                        id: c.person2_name.toLowerCase().replace(/[^a-z0-9]/g, ''),
+                                        name: c.person2_name,
+                                        role: '', x: 200, y: 100
+                                    };
+                                    people.push(person2);
+                                }
+                                connections.push({
+                                    from: person1.id,
+                                    to: person2.id,
+                                    type: c.relationship_category || '',
+                                    label: c.relationship_type || '',
+                                    source_type: c.source_type || '',
+                                    source_details: c.source_details || '',
+                                    date: c.date || '',
+                                    location: c.location || '',
+                                    notes: c.notes || ''
+                                });
+                            } else {
+                                // Already in internal format
+                                connections.push({...c});
+                            }
+                        });
+                        refreshMap();
+                        showUploadStatus('JSON file loaded successfully!', 'success');
+                    } else {
+                        showUploadStatus('Invalid JSON format: missing people or connections.', 'error');
+                    }
+                } catch (error) {
+                    showUploadStatus('Error processing JSON file: ' + error.message, 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // --- EDIT PERSON MODAL LOGIC ---
+        let editingPersonId = null;
+        function openEditPersonModal(personId) {
+            const modal = document.getElementById('editPersonModal');
+            const form = document.getElementById('editPersonForm');
+            const nameInput = document.getElementById('editPersonName');
+            const roleInput = document.getElementById('editPersonRole');
+            const person = people.find(p => p.id === personId);
+            if (!person) return;
+            editingPersonId = personId;
+            nameInput.value = person.name;
+            roleInput.value = person.role;
+            modal.style.display = 'flex';
+            nameInput.focus();
+        }
+        document.getElementById('cancelEditPerson').onclick = function() {
+            document.getElementById('editPersonModal').style.display = 'none';
+            editingPersonId = null;
+        };
+        document.getElementById('editPersonForm').onsubmit = function(e) {
+            e.preventDefault();
+            if (!editingPersonId) return;
+            const name = document.getElementById('editPersonName').value.trim();
+            const role = document.getElementById('editPersonRole').value.trim();
+            const idx = people.findIndex(p => p.id === editingPersonId);
+            if (idx !== -1) {
+                people[idx].name = name;
+                people[idx].role = role;
+            }
+            document.getElementById('editPersonModal').style.display = 'none';
+            editingPersonId = null;
+            refreshMap();
+        };
 
         // Initialize the map when page loads
         window.addEventListener('load', function() {

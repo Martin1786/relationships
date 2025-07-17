@@ -4,22 +4,22 @@
       "id": "mariasantos",
       "name": "Maria Santos",
       "role": "Village Mayor",
-      "x": 500,
-      "y": 50
+      "x": 310,
+      "y": 8
     },
     {
       "id": "tombaker",
       "name": "Tom Baker",
       "role": "Village Baker",
-      "x": 200,
-      "y": 150
+      "x": 68,
+      "y": 46
     },
     {
       "id": "annachen",
       "name": "Anna Chen",
       "role": "School Teacher",
-      "x": 700,
-      "y": 120
+      "x": 768,
+      "y": 0
     },
     {
       "id": "johnmiller",
@@ -46,22 +46,22 @@
       "id": "lisawong",
       "name": "Lisa Wong",
       "role": "General Store",
-      "x": 837,
-      "y": 89
+      "x": 450,
+      "y": 200
     },
     {
       "id": "bobtaylor",
       "name": "Bob Taylor",
       "role": "Mechanic",
-      "x": 350,
-      "y": 350
+      "x": 389,
+      "y": 491
     },
     {
       "id": "emmadavis",
-      "name": "Emma Davis",
+      "name": "Emma Davis2",
       "role": "Librarian",
-      "x": 800,
-      "y": 300
+      "x": 1026,
+      "y": 66
     },
     {
       "id": "carlosrodriguez",
@@ -74,29 +74,29 @@
       "id": "helentaylor",
       "name": "Helen Taylor",
       "role": "Village Nurse",
-      "x": 550,
-      "y": 400
+      "x": 818,
+      "y": 480
     },
     {
       "id": "fatherobrien",
       "name": "Father O'Brien",
       "role": "Village Priest",
-      "x": 750,
-      "y": 450
+      "x": 1046,
+      "y": 428
     },
     {
       "id": "david",
       "name": "David",
-      "role": "Unknown Role",
-      "x": 999,
-      "y": 167
+      "role": "Runt",
+      "x": 977,
+      "y": 169
     },
     {
       "id": "goliath",
       "name": "Goliath",
-      "role": "Unknown Role",
-      "x": 1002,
-      "y": 371
+      "role": "Giant of a man",
+      "x": 1019,
+      "y": 301
     }
   ],
   "connections": [
@@ -211,7 +211,7 @@
       "notes": ""
     },
     {
-      "person1_name": "Emma Davis",
+      "person1_name": "Emma Davis2",
       "person2_name": "Anna Chen",
       "relationship_type": "Education Resources",
       "relationship_category": "work",
@@ -244,7 +244,7 @@
       "notes": ""
     },
     {
-      "person1_name": "Emma Davis",
+      "person1_name": "Emma Davis2",
       "person2_name": "Dr. Patel",
       "relationship_type": "Book Club",
       "relationship_category": "social",
@@ -256,7 +256,7 @@
     },
     {
       "person1_name": "Anna Chen",
-      "person2_name": "Emma Davis",
+      "person2_name": "Emma Davis2",
       "relationship_type": "Book Club",
       "relationship_category": "social",
       "source_type": "",
@@ -313,7 +313,7 @@
       "person1_name": "David",
       "person2_name": "Goliath",
       "relationship_type": "Friends",
-      "relationship_category": "social",
+      "relationship_category": "Social",
       "source_type": "",
       "source_details": "",
       "date": "",
