@@ -11,92 +11,106 @@
       "id": "tombaker",
       "name": "Tom Baker",
       "role": "Village Baker",
-      "x": 200,
-      "y": 150
+      "x": 216,
+      "y": 41
     },
     {
       "id": "annachen",
       "name": "Anna Chen",
       "role": "School Teacher",
-      "x": 741,
-      "y": 0
+      "x": 735,
+      "y": 14
     },
     {
       "id": "johnmiller",
       "name": "John Miller",
       "role": "Farmer",
-      "x": 100,
-      "y": 300
+      "x": 66,
+      "y": 212
     },
     {
       "id": "sarahmiller",
       "name": "Sarah Miller",
       "role": "Farmer",
-      "x": 250,
-      "y": 280
+      "x": 87,
+      "y": 346
     },
     {
       "id": "drpatel",
       "name": "Dr. Patel",
       "role": "Village Doctor",
-      "x": 974,
-      "y": 339
+      "x": 568,
+      "y": 164
     },
     {
       "id": "lisawong",
       "name": "Lisa Wong",
       "role": "General Store",
-      "x": 314,
-      "y": 41
+      "x": 356,
+      "y": 207
     },
     {
       "id": "bobtaylor",
       "name": "Bob Taylor",
       "role": "Mechanic",
-      "x": 385,
-      "y": 477
+      "x": 266,
+      "y": 415
     },
     {
       "id": "emmadavis",
       "name": "Emma Davis",
       "role": "Librarian",
-      "x": 1048,
-      "y": 6
+      "x": 867,
+      "y": 265
     },
     {
       "id": "carlosrodriguez",
       "name": "Carlos Rodriguez",
       "role": "Postman",
-      "x": 150,
-      "y": 450
+      "x": 85,
+      "y": 489
     },
     {
       "id": "helentaylor",
       "name": "Helen Taylor",
       "role": "Village Nurse",
-      "x": 558,
-      "y": 472
+      "x": 507,
+      "y": 479
     },
     {
       "id": "fatherobrien",
       "name": "Father O'Brien",
       "role": "Village Priest",
-      "x": 750,
-      "y": 450
+      "x": 699,
+      "y": 350
     },
     {
-      "id": "david",
-      "name": "David",
-      "role": "Unknown Role",
-      "x": 822,
-      "y": 285
+      "id": "freddymercury",
+      "name": "Freddy Mercury",
+      "role": "Pop singer",
+      "x": 1026,
+      "y": 281
     },
     {
-      "id": "goliath",
-      "name": "Goliath",
-      "role": "Unknown Role",
-      "x": 891,
-      "y": 147
+      "id": "vanhalen",
+      "name": "Van Halen",
+      "role": "Pop singer",
+      "x": 1025,
+      "y": 0
+    },
+    {
+      "id": "danbrown",
+      "name": "Dan Brown",
+      "role": "Promoter",
+      "x": 1031,
+      "y": 481
+    },
+    {
+      "id": "rolfeharris",
+      "name": "Rolfe Harris",
+      "role": "Artist",
+      "x": 845,
+      "y": 407
     }
   ],
   "connections": [
@@ -250,8 +264,8 @@
       "relationship_category": "social",
       "source_type": "",
       "source_details": "",
-      "date": "25/08/2025",
-      "location": "Brussels",
+      "date": "",
+      "location": "",
       "notes": ""
     },
     {
@@ -310,25 +324,58 @@
       "notes": ""
     },
     {
-      "person1_name": "David",
-      "person2_name": "Goliath",
-      "relationship_type": "Friends",
-      "relationship_category": "social",
-      "source_type": "Interview",
-      "source_details": "Interview research",
-      "date": "25/08/2027",
-      "location": "Plains of Sodom",
-      "notes": ""
-    },
-    {
-      "person1_name": "Goliath",
-      "person2_name": "Emma Davis",
-      "relationship_type": "Co-worker",
+      "person1_name": "Freddy Mercury",
+      "person2_name": "Van Halen",
+      "relationship_type": "Band members",
       "relationship_category": "work",
       "source_type": "",
       "source_details": "",
+      "date": "14/02/1904",
+      "location": "New York",
+      "notes": ""
+    },
+    {
+      "person1_name": "Anna Chen",
+      "person2_name": "Van Halen",
+      "relationship_type": "Friends",
+      "relationship_category": "social",
+      "source_type": "",
+      "source_details": "",
       "date": "24/07/2024",
-      "location": "London",
+      "location": "Swansea",
+      "notes": ""
+    },
+    {
+      "person1_name": "Dan Brown",
+      "person2_name": "Freddy Mercury",
+      "relationship_type": "Married",
+      "relationship_category": "social",
+      "source_type": "",
+      "source_details": "",
+      "date": "",
+      "location": "",
+      "notes": ""
+    },
+    {
+      "person1_name": "Rolfe Harris",
+      "person2_name": "Dan Brown",
+      "relationship_type": "",
+      "relationship_category": "social",
+      "source_type": "Document",
+      "source_details": "",
+      "date": "24/07/2024",
+      "location": "",
+      "notes": ""
+    },
+    {
+      "person1_name": "Rolfe Harris",
+      "person2_name": "Dan Brown",
+      "relationship_type": "Friends",
+      "relationship_category": "social",
+      "source_type": "",
+      "source_details": "",
+      "date": "",
+      "location": "",
       "notes": ""
     }
   ]
