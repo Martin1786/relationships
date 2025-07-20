@@ -4,8 +4,8 @@
       "id": "mariasantos",
       "name": "Maria Santos",
       "role": "Village Mayor",
-      "x": 500,
-      "y": 50
+      "x": 411,
+      "y": 0
     },
     {
       "id": "tombaker",
@@ -18,8 +18,8 @@
       "id": "annachen",
       "name": "Anna Chen",
       "role": "School Teacher",
-      "x": 735,
-      "y": 14
+      "x": 733,
+      "y": 0
     },
     {
       "id": "johnmiller",
@@ -60,8 +60,8 @@
       "id": "emmadavis",
       "name": "Emma Davis",
       "role": "Librarian",
-      "x": 867,
-      "y": 265
+      "x": 885,
+      "y": 198
     },
     {
       "id": "carlosrodriguez",
@@ -109,8 +109,8 @@
       "id": "rolfeharris",
       "name": "Rolfe Harris",
       "role": "Artist",
-      "x": 845,
-      "y": 407
+      "x": 802,
+      "y": 493
     },
     {
       "id": "jessconrad",
@@ -395,6 +395,17 @@
       "date": "24/07/2024",
       "location": "Swansea",
       "notes": "Test of notes"
+    },
+    {
+      "person1_name": "Helen Taylor",
+      "person2_name": "Rolfe Harris",
+      "relationship_type": "Co-worker",
+      "relationship_category": "social",
+      "source_type": "Document",
+      "source_details": "advert",
+      "date": "24/07/2024",
+      "location": "Cyprus",
+      "notes": ""
     }
   ]
 }
