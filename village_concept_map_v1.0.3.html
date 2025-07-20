@@ -6,6 +6,8 @@
     <title>Village Relationships Concept Map</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="stylesheet" href="style.css">  
+    <link href="https://unpkg.com/vis-network/styles/vis-network.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
     
 </head>
 <body>
@@ -20,6 +22,7 @@
         <button class="drawer-action-btn" onclick="openAddRelationshipModal()" title="Add Relationship">➕ Add Relationship</button>
         <button class="drawer-action-btn" onclick="openAddPersonModal()" title="Add Person">➕ Add Person</button>
         <button class="drawer-action-btn" onclick="openDataEntryModal()" title="Open Data Entry Form">✏️ Open Data Entry Form</button>
+        <button class="drawer-action-btn" onclick="openOptionsModal()" title="Options">⚙️ Options</button>
         <div style="border-top: 1px solid #e0e0e0; margin: 10px 0;"></div>
         <button class="drawer-action-btn" onclick="document.getElementById('gedcomFile').click()" title="Upload GEDCOM File">📁 Upload GEDCOM File</button>
         <button class="drawer-action-btn" onclick="document.getElementById('jsonFile').click()" title="Upload JSON File">🗂️ Upload JSON File</button>
@@ -50,8 +53,7 @@
             </div>
         </div>
         
-        <div class="map-container" id="mapContainer">
-        </div>
+        <div class="map-container" id="mapContainer"></div>
         
         
         <!-- Import and data entry actions are now in the drawer -->
@@ -80,7 +82,13 @@
         <h3>Edit Relationship</h3>
         <form id="editConnectionForm">
           <label>Type/Label:<br><input type="text" id="editConnLabel" placeholder="Relationship type (e.g. Friends, Married)" style="width:100%; margin-bottom:10px;"></label><br>
-          <label>Category:<br><input type="text" id="editConnType" placeholder="family, work, or social" style="width:100%; margin-bottom:10px;"></label><br>
+          <label>Category:<br>
+            <select id="editConnType" style="width:100%; margin-bottom:10px;">
+              <option value="family">Family</option>
+              <option value="work">Work</option>
+              <option value="social">Social</option>
+            </select>
+          </label><br>
           <label>Source Type:<br><input type="text" id="editConnSourceType" placeholder="Source type (e.g. Interview)" style="width:100%; margin-bottom:10px;"></label><br>
           <label>Source Details:<br><input type="text" id="editConnSourceDetails" placeholder="Source details (e.g. Conversation notes)" style="width:100%; margin-bottom:10px;"></label><br>
           <label>Date:<br><input type="text" id="editConnDate" placeholder="Date (e.g. 2025-06-01)" style="width:100%; margin-bottom:10px;"></label><br>
@@ -101,7 +109,13 @@
           <label>Person 1:<br><select id="addRelPerson1" style="width:100%; margin-bottom:10px;"></select></label><br>
           <label>Person 2:<br><select id="addRelPerson2" style="width:100%; margin-bottom:10px;"></select></label><br>
           <label>Type/Label:<br><input type="text" id="addRelLabel" placeholder="Relationship type (e.g. Friends, Married)" style="width:100%; margin-bottom:10px;"></label><br>
-          <label>Category:<br><input type="text" id="addRelType" placeholder="family, work, or social" style="width:100%; margin-bottom:10px;"></label><br>
+          <label>Category:<br>
+            <select id="addRelType" style="width:100%; margin-bottom:10px;">
+              <option value="family">Family</option>
+              <option value="work">Work</option>
+              <option value="social">Social</option>
+            </select>
+          </label><br>
           <label>Source Type:<br><input type="text" id="addRelSourceType" placeholder="Source type (e.g. Interview)" style="width:100%; margin-bottom:10px;"></label><br>
           <label>Source Details:<br><input type="text" id="addRelSourceDetails" placeholder="Source details (e.g. Conversation notes)" style="width:100%; margin-bottom:10px;"></label><br>
           <label>Date:<br><input type="text" id="addRelDate" placeholder="Date (e.g. 2025-06-01)" style="width:100%; margin-bottom:10px;"></label><br>
@@ -196,6 +210,8 @@
                     if (jsonData.people && jsonData.connections) {
                         window.people = [];
                         window.connections = [];
+                        if (jsonData.box_color) window.BOX_COLOR = jsonData.box_color;
+                        if (jsonData.box_text_color) window.BOX_TEXT_COLOR = jsonData.box_text_color;
                         jsonData.people.forEach(p => window.people.push({...p}));
                         jsonData.connections.forEach(c => {
                             if (c.person1_name && c.person2_name) {
@@ -235,23 +251,22 @@
                                 window.connections.push({...c});
                             }
                         });
-                        window.refreshMap();
+                        window.renderVisNetwork();
                         window.showUploadStatus('Loaded village_map.json successfully.', 'success');
                     } else {
                         window.showUploadStatus('village_map.json is missing people or connections array.', 'error');
-                        window.refreshMap();
+                        window.renderVisNetwork();
                     }
                 })
                 .catch(err => {
                     window.people = [];
                     window.connections = [];
-                    window.refreshMap();
+                    window.renderVisNetwork();
                     window.showUploadStatus('No default data found. Please upload or add data to begin.', 'info');
                 });
         });
 
         // Attach refreshMap and showUploadStatus to window for global use
-        window.refreshMap = refreshMap;
         window.showUploadStatus = showUploadStatus;
 
         // --- LEGEND FILTER CLICK HANDLERS ---
@@ -398,7 +413,7 @@
                 }
             }
             
-            refreshMap();
+            renderVisNetwork();
         }
 
         function addGedcomDataToMap(individuals, families) {
@@ -458,14 +473,82 @@
                 }
             });
             
-            refreshMap();
+            renderVisNetwork();
         }
 
-        function refreshMap() {
-            document.getElementById('mapContainer').innerHTML = '';
-            window.createPeople();
-            window.createConnections();
+        // vis-network rendering
+        function renderVisNetwork() {
+            // Convert people to vis nodes
+            const nodes = new vis.DataSet(window.people.map(p => ({
+                id: p.id,
+                label: p.name + (p.role ? '\n' + p.role : ''),
+                shape: 'box',
+                color: {
+                    background: (typeof BOX_COLOR !== 'undefined' ? BOX_COLOR : '#ffffff'),
+                    border: '#34495e',
+                    highlight: {
+                        background: (typeof BOX_COLOR !== 'undefined' ? BOX_COLOR : '#ffffff'),
+                        border: '#1976d2'
+                    }
+                },
+                font: { multi: 'html', size: 18, color: (typeof BOX_TEXT_COLOR !== 'undefined' ? BOX_TEXT_COLOR : '#2c3e50') }
+            })));
+
+            // Convert connections to vis edges
+            const edges = new vis.DataSet(window.connections.map(c => ({
+                from: c.from,
+                to: c.to,
+                label: c.label || '',
+                color: c.type === 'family' ? '#e74c3c' : c.type === 'work' ? '#3498db' : '#2ecc71',
+                font: { size: 14, align: 'middle' },
+                width: (typeof CONNECTION_LINE_WIDTH !== 'undefined' ? CONNECTION_LINE_WIDTH : 2)
+            })));
+
+            const container = document.getElementById('mapContainer');
+            const data = { nodes, edges };
+            const options = {
+                layout: { improvedLayout: true },
+                physics: { enabled: true, stabilization: true },
+                nodes: {
+                    shape: 'box',
+                    margin: 10,
+                    widthConstraint: { maximum: 180 }
+                },
+                edges: {
+                    smooth: true,
+                    arrows: { to: false },
+                    width: (typeof CONNECTION_LINE_WIDTH !== 'undefined' ? CONNECTION_LINE_WIDTH : 2)
+                },
+                interaction: {
+                    hover: true,
+                    dragNodes: true,
+                    zoomView: true,
+                    dragView: true
+                }
+            };
+            // Destroy previous network if exists
+            if (window.visNetworkInstance) window.visNetworkInstance.destroy();
+            window.visNetworkInstance = new vis.Network(container, data, options);
+
+            // Double-click editing
+            window.visNetworkInstance.on('doubleClick', function(params) {
+                if (params.nodes.length === 1) {
+                    // Edit person
+                    window.openEditPersonModal(params.nodes[0]);
+                } else if (params.edges.length === 1) {
+                    // Find the edge index in your connections array
+                    const edgeId = params.edges[0];
+                    const edge = window.visNetworkInstance.body.data.edges.get(edgeId);
+                    const connIndex = window.connections.findIndex((c) => {
+                        return c.from === edge.from && c.to === edge.to && (c.label || '') === (edge.label || '');
+                    });
+                    if (connIndex !== -1) {
+                        window.openEditConnectionModal(connIndex);
+                    }
+                }
+            });
         }
+        window.renderVisNetwork = renderVisNetwork;
 
         function showUploadStatus(message, type) {
             const statusDiv = document.getElementById('uploadStatus');
@@ -484,9 +567,9 @@
         // --- DOWNLOAD MAP AS JSON FUNCTION ---
         function downloadMapAsJSON() {
             // Map connections to the new format
-            const formattedConnections = connections.map(conn => {
-                const person1 = people.find(p => p.id === conn.from) || {};
-                const person2 = people.find(p => p.id === conn.to) || {};
+            const formattedConnections = window.connections.map(conn => {
+                const person1 = window.people.find(p => p.id === conn.from) || {};
+                const person2 = window.people.find(p => p.id === conn.to) || {};
                 return {
                     person1_name: person1.name || '',
                     person2_name: person2.name || '',
@@ -500,8 +583,10 @@
                 };
             });
             const data = {
-                people: people,
-                connections: formattedConnections
+                people: window.people,
+                connections: formattedConnections,
+                box_color: (typeof BOX_COLOR !== 'undefined' ? BOX_COLOR : '#ffffff'),
+                box_text_color: (typeof BOX_TEXT_COLOR !== 'undefined' ? BOX_TEXT_COLOR : '#2c3e50')
             };
             const jsonStr = JSON.stringify(data, null, 2);
             const blob = new Blob([jsonStr], { type: 'application/json' });
@@ -528,6 +613,8 @@
                         // Replace current data
                         people.length = 0;
                         connections.length = 0;
+                        if (jsonData.box_color) window.BOX_COLOR = jsonData.box_color;
+                        if (jsonData.box_text_color) window.BOX_TEXT_COLOR = jsonData.box_text_color;
                         jsonData.people.forEach(p => people.push({...p}));
                         // Detect and convert CSV-style connections if needed
                         jsonData.connections.forEach(c => {
@@ -568,7 +655,7 @@
                                 connections.push({...c});
                             }
                         });
-                        refreshMap();
+                        renderVisNetwork();
                         showUploadStatus('JSON file loaded successfully!', 'success');
                     } else {
                         showUploadStatus('Invalid JSON format: missing people or connections.', 'error');
@@ -640,6 +727,25 @@ function closeAboutModal() {
 }
 window.openAboutModal = openAboutModal;
 window.closeAboutModal = closeAboutModal;
+
+// Options modal logic
+function openOptionsModal() {
+    document.getElementById('optionsModal').style.display = 'flex';
+    document.getElementById('boxColorInput').value = (typeof BOX_COLOR !== 'undefined' ? BOX_COLOR : '#ffffff');
+    document.getElementById('boxTextColorInput').value = (typeof BOX_TEXT_COLOR !== 'undefined' ? BOX_TEXT_COLOR : '#2c3e50');
+}
+function closeOptionsModal() {
+    document.getElementById('optionsModal').style.display = 'none';
+}
+window.openOptionsModal = openOptionsModal;
+window.closeOptionsModal = closeOptionsModal;
+document.getElementById('optionsForm').onsubmit = function(e) {
+    e.preventDefault();
+    window.BOX_COLOR = document.getElementById('boxColorInput').value;
+    window.BOX_TEXT_COLOR = document.getElementById('boxTextColorInput').value;
+    closeOptionsModal();
+    window.renderVisNetwork();
+};
     </script>
     <!-- Hidden file inputs for drawer upload buttons -->
     <input type="file" id="gedcomFile" accept=".ged" style="display: none;" onchange="handleGedcomUpload(event)">
@@ -652,6 +758,20 @@ window.closeAboutModal = closeAboutModal;
         <div style="text-align:right; margin-top:16px;">
           <button type="button" onclick="closeAboutModal()">Close</button>
         </div>
+      </div>
+    </div>
+    <!-- Options Modal -->
+    <div id="optionsModal" style="display:none; position:fixed; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.3); z-index:3000; align-items:center; justify-content:center;">
+      <div style="background:#fff; padding:24px 32px; border-radius:10px; min-width:300px; max-width:90vw; box-shadow:0 8px 32px rgba(0,0,0,0.2); position:relative;">
+        <h3>Options</h3>
+        <form id="optionsForm">
+          <label>Box Color:<br><input type="color" id="boxColorInput" value="#ffffff" style="width: 60px; height: 32px;"></label><br><br>
+          <label>Box Text Color:<br><input type="color" id="boxTextColorInput" value="#2c3e50" style="width: 60px; height: 32px;"></label><br><br>
+          <div style="text-align:right; margin-top:16px;">
+            <button type="button" onclick="closeOptionsModal()">Cancel</button>
+            <button type="submit">Save</button>
+          </div>
+        </form>
       </div>
     </div>
 </body>

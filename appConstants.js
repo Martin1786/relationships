@@ -16,4 +16,7 @@ const BUTTON_LABELS = {
 };
 const INSTRUCTIONS = {
     howToUse: 'Click the filter buttons, above to focus on specific relationship types. Hover over people to see them highlighted. Upload your GEDCOM file for family data and JSON file for social/work relationships, or use the data entry form to capture information from newspaper clippings. Use the Reset Data button to clear all sample data before importing your own.'
-}; 
+};
+const CONNECTION_LINE_WIDTH = 3;
+const BOX_COLOR = '#ffffff'; // default white
+const BOX_TEXT_COLOR = '#2c3e50'; // default dark 
