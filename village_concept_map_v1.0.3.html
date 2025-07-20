@@ -17,11 +17,15 @@
         <nav class="drawer" id="sideDrawer" aria-label="Main menu">
             <div class="drawer-header">Menu</div>
             <div class="drawer-actions">
-        <button class="drawer-action-btn" id="drawerDownloadJsonBtn" onclick="downloadMapAsJSON()" title="Download Map as JSON"></button>
-        <button class="drawer-action-btn" id="drawerAddRelationshipBtn" onclick="openAddRelationshipModal()" title="Add Relationship"></button>
-        <button class="drawer-action-btn" id="drawerAddPersonBtn" onclick="openAddPersonModal()" title="Add Person"></button>
-        <button class="drawer-action-btn" id="drawerOpenDataEntryBtn" onclick="openDataEntryModal()" title="Open Data Entry Form"></button>
-        <button class="drawer-action-btn reset-btn" id="drawerResetDataBtn" onclick="resetData()" title="Reset Data"></button>
+        <button class="drawer-action-btn" onclick="openAddRelationshipModal()" title="Add Relationship">➕ Add Relationship</button>
+        <button class="drawer-action-btn" onclick="openAddPersonModal()" title="Add Person">➕ Add Person</button>
+        <button class="drawer-action-btn" onclick="openDataEntryModal()" title="Open Data Entry Form">✏️ Open Data Entry Form</button>
+        <div style="border-top: 1px solid #e0e0e0; margin: 10px 0;"></div>
+        <button class="drawer-action-btn" onclick="document.getElementById('gedcomFile').click()" title="Upload GEDCOM File">📁 Upload GEDCOM File</button>
+        <button class="drawer-action-btn" onclick="document.getElementById('jsonFile').click()" title="Upload JSON File">🗂️ Upload JSON File</button>
+        <button class="drawer-action-btn reset-btn" onclick="resetData()" title="Reset Data">🗑️ Reset Data</button>
+        <button class="drawer-action-btn" onclick="downloadMapAsJSON()" title="Download Map as JSON">⬇️ Download Map as JSON</button>
+        <button class="drawer-action-btn" onclick="openAboutModal()" title="About / Instructions">ℹ️ About / Instructions</button>
     </div>
     </nav>
     <div class="container">
@@ -50,26 +54,9 @@
         </div>
         
         
-        <div class="file-controls" style="text-align: center; margin: 20px 0; padding: 20px; background: #f8f9fa; border-radius: 8px;">
-            <h3 style="margin-top: 0; color: #2c3e50;">Import Your Data</h3>
-            <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
-                <label class="file-upload-btn">
-                    <input type="file" id="gedcomFile" accept=".ged" style="display: none;" onchange="handleGedcomUpload(event)">
-                    📁 Upload GEDCOM File
-                </label>
-                <label class="file-upload-btn">
-                    <input type="file" id="jsonFile" accept=".json" style="display: none;" onchange="handleJsonUpload(event)">
-                    🗂️ Upload JSON File
-                </label>
-                <button class="file-upload-btn" onclick="openDataEntryModal()">✏️ Open Data Entry Form</button>
-                <button class="file-upload-btn reset-btn" onclick="resetData()">🗑️ Reset Data</button>
-            </div>
-            <p style="color: #7f8c8d; font-size: 0.9em; margin-top: 10px;">
-                Upload your GEDCOM file for family relationships and JSON for social/work relationships
-            </p>
-        </div>
+        <!-- Import and data entry actions are now in the drawer -->
         
-        <div class="info-panel" id="infoPanel"></div>
+        <!-- Instructions now in About modal -->
         
         <div id="uploadStatus" class="upload-status"></div>
     </div>
@@ -635,6 +622,37 @@ sideDrawer.addEventListener('keydown', function(e) {
         }
     }
 });
+
+// About / Instructions modal logic
+function openAboutModal() {
+    // Close the drawer if open
+    var sideDrawer = document.getElementById('sideDrawer');
+    var drawerBackdrop = document.getElementById('drawerBackdrop');
+    if (sideDrawer && sideDrawer.classList.contains('open')) {
+        sideDrawer.classList.remove('open');
+        if (drawerBackdrop) drawerBackdrop.style.display = 'none';
+    }
+    document.getElementById('aboutModal').style.display = 'flex';
+    document.getElementById('aboutInstructions').innerHTML = '<strong>How to use:</strong> ' + (typeof INSTRUCTIONS !== 'undefined' ? INSTRUCTIONS.howToUse : '');
+}
+function closeAboutModal() {
+    document.getElementById('aboutModal').style.display = 'none';
+}
+window.openAboutModal = openAboutModal;
+window.closeAboutModal = closeAboutModal;
     </script>
+    <!-- Hidden file inputs for drawer upload buttons -->
+    <input type="file" id="gedcomFile" accept=".ged" style="display: none;" onchange="handleGedcomUpload(event)">
+    <input type="file" id="jsonFile" accept=".json" style="display: none;" onchange="handleJsonUpload(event)">
+    <!-- About / Instructions Modal -->
+    <div id="aboutModal" style="display:none; position:fixed; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.3); z-index:3000; align-items:center; justify-content:center;">
+      <div style="background:#fff; padding:24px 32px; border-radius:10px; min-width:300px; max-width:90vw; box-shadow:0 8px 32px rgba(0,0,0,0.2); position:relative;">
+        <h3>About / Instructions</h3>
+        <div id="aboutInstructions"></div>
+        <div style="text-align:right; margin-top:16px;">
+          <button type="button" onclick="closeAboutModal()">Close</button>
+        </div>
+      </div>
+    </div>
 </body>
 </html>
