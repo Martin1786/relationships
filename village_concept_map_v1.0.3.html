@@ -478,31 +478,71 @@
 
         // vis-network rendering
         function renderVisNetwork() {
-            // Convert people to vis nodes
-            const nodes = new vis.DataSet(window.people.map(p => ({
-                id: p.id,
-                label: p.name + (p.role ? '\n' + p.role : ''),
-                shape: 'box',
-                color: {
-                    background: (typeof BOX_COLOR !== 'undefined' ? BOX_COLOR : '#ffffff'),
-                    border: '#34495e',
-                    highlight: {
+            // Two nodes per person: name and role
+            const nodesArr = [];
+            const roleColor = '#e3eaf7'; // light blue for role node
+            window.people.forEach(p => {
+                // Name node
+                nodesArr.push({
+                    id: p.id,
+                    label: p.name,
+                    shape: 'box',
+                    color: {
                         background: (typeof BOX_COLOR !== 'undefined' ? BOX_COLOR : '#ffffff'),
-                        border: '#1976d2'
-                    }
-                },
-                font: { multi: 'html', size: 18, color: (typeof BOX_TEXT_COLOR !== 'undefined' ? BOX_TEXT_COLOR : '#2c3e50') }
-            })));
+                        border: '#34495e',
+                        highlight: {
+                            background: (typeof BOX_COLOR !== 'undefined' ? BOX_COLOR : '#ffffff'),
+                            border: '#1976d2'
+                        }
+                    },
+                    font: { size: 18, color: (typeof BOX_TEXT_COLOR !== 'undefined' ? BOX_TEXT_COLOR : '#2c3e50') }
+                });
+                // Role node (if present)
+                if (p.role) {
+                    nodesArr.push({
+                        id: p.id + '_role',
+                        label: p.role,
+                        shape: 'box',
+                        color: {
+                            background: roleColor,
+                            border: '#b0b8c1',
+                            highlight: {
+                                background: roleColor,
+                                border: '#1976d2'
+                            }
+                        },
+                        font: { size: 14, color: '#7f8c8d', ital: true },
+                        physics: false
+                    });
+                }
+            });
+            const nodes = new vis.DataSet(nodesArr);
 
-            // Convert connections to vis edges
-            const edges = new vis.DataSet(window.connections.map(c => ({
+            // Edges: relationship edges between main nodes, and short edge from name to role
+            const edgesArr = window.connections.map(c => ({
                 from: c.from,
                 to: c.to,
                 label: c.label || '',
                 color: c.type === 'family' ? '#e74c3c' : c.type === 'work' ? '#3498db' : '#2ecc71',
                 font: { size: 14, align: 'middle' },
                 width: (typeof CONNECTION_LINE_WIDTH !== 'undefined' ? CONNECTION_LINE_WIDTH : 2)
-            })));
+            }));
+            // Add short edge from name node to role node
+            window.people.forEach(p => {
+                if (p.role) {
+                    edgesArr.push({
+                        from: p.id,
+                        to: p.id + '_role',
+                        color: { color: '#b0b8c1' },
+                        width: 1,
+                        length: 1,
+                        physics: false,
+                        arrows: { to: false },
+                        label: ''
+                    });
+                }
+            });
+            const edges = new vis.DataSet(edgesArr);
 
             const container = document.getElementById('mapContainer');
             const data = { nodes, edges };
