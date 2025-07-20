@@ -35,19 +35,19 @@
         <p class="subtitle">Exploring the interconnected relationships in a small village community</p>
         
         <div class="legend">
-            <div class="legend-item legend-all active" data-type="all" tabindex="0" title="Show All">
+            <div class="legend-item legend-all active" data-type="all" tabindex="0" title="Show All" onclick="filterConnections('all')">
                 <div class="legend-dot" style="background: #34495e;"></div>
                 <span id="legendAllLabel"></span>
             </div>
-            <div class="legend-item legend-family" data-type="family" tabindex="0" title="Family Only">
+            <div class="legend-item legend-family" data-type="family" tabindex="0" title="Family Only" onclick="filterConnections('family')">
                 <div class="legend-dot" style="background: #e74c3c;"></div>
                 <span id="legendFamilyLabel"></span>
             </div>
-            <div class="legend-item legend-work" data-type="work" tabindex="0" title="Work Only">
+            <div class="legend-item legend-work" data-type="work" tabindex="0" title="Work Only" onclick="filterConnections('work')">
                 <div class="legend-dot" style="background: #3498db;"></div>
                <span id="legendWorkLabel"></span>
             </div>
-            <div class="legend-item legend-social" data-type="social" tabindex="0" title="Social Only">
+            <div class="legend-item legend-social" data-type="social" tabindex="0" title="Social Only" onclick="filterConnections('social')">
                 <div class="legend-dot" style="background: #2ecc71;"></div>
                 <span id="legendSocialLabel"></span>
             </div>
@@ -284,19 +284,16 @@
             });
         });
 
+        // vis-network legend filter logic
+        window.currentEdgeFilter = 'all';
         function filterConnections(type) {
+            window.currentEdgeFilter = type;
             // Update legend active states
             document.querySelectorAll('.legend-item').forEach(item => item.classList.remove('active'));
             document.querySelector(`.legend-item.legend-${type}`).classList.add('active');
-            // Show/hide connections
-            document.querySelectorAll('.connection, .connection-label').forEach(el => {
-                if (type === 'all' || el.dataset.type === type) {
-                    el.style.display = 'block';
-                } else {
-                    el.style.display = 'none';
-                }
-            });
+            window.renderVisNetwork();
         }
+        window.filterConnections = filterConnections;
 
         // File handling functions
         function handleGedcomUpload(event) {
@@ -519,15 +516,19 @@
             const nodes = new vis.DataSet(nodesArr);
 
             // Edges: relationship edges between main nodes, and short edge from name to role
-            const edgesArr = window.connections.map(c => ({
-                from: c.from,
-                to: c.to,
-                label: c.label || '',
-                color: c.type === 'family' ? '#e74c3c' : c.type === 'work' ? '#3498db' : '#2ecc71',
-                font: { size: 14, align: 'middle' },
-                width: (typeof CONNECTION_LINE_WIDTH !== 'undefined' ? CONNECTION_LINE_WIDTH : 2)
-            }));
-            // Add short edge from name node to role node
+            const filterType = window.currentEdgeFilter || 'all';
+            const edgesArr = window.connections
+                .filter(c => filterType === 'all' || c.type === filterType)
+                .map(c => ({
+                    from: c.from,
+                    to: c.to,
+                    label: c.label || '',
+                    color: c.type === 'family' ? '#e74c3c' : c.type === 'work' ? '#3498db' : '#2ecc71',
+                    font: { size: 14, align: 'middle' },
+                    width: (typeof CONNECTION_LINE_WIDTH !== 'undefined' ? CONNECTION_LINE_WIDTH : 2),
+                    length: 300
+                }));
+            // Add short edge from name node to role node (always shown)
             window.people.forEach(p => {
                 if (p.role) {
                     edgesArr.push({
