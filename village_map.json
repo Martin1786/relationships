@@ -111,6 +111,13 @@
       "role": "Artist",
       "x": 845,
       "y": 407
+    },
+    {
+      "id": "jessconrad",
+      "name": "Jess Conrad",
+      "role": "Pop Idol",
+      "x": 10,
+      "y": 8
     }
   ],
   "connections": [
@@ -374,9 +381,20 @@
       "relationship_category": "social",
       "source_type": "",
       "source_details": "",
-      "date": "",
+      "date": "25/08/2025",
       "location": "",
-      "notes": ""
+      "notes": "Test"
+    },
+    {
+      "person1_name": "Jess Conrad",
+      "person2_name": "John Miller",
+      "relationship_type": "Friends",
+      "relationship_category": "social",
+      "source_type": "Discussion",
+      "source_details": "",
+      "date": "24/07/2024",
+      "location": "Swansea",
+      "notes": "Test of notes"
     }
   ]
 }
