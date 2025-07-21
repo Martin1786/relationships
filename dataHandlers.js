@@ -141,7 +141,9 @@ function downloadMapAsJSON(people, connections) {
     });
     const data = {
         people: people,
-        connections: formattedConnections
+        connections: formattedConnections,
+        box_color: (typeof BOX_COLOR !== 'undefined' ? BOX_COLOR : '#ffffff'),
+        box_text_color: (typeof BOX_TEXT_COLOR !== 'undefined' ? BOX_TEXT_COLOR : '#2c3e50')
     };
     const jsonStr = JSON.stringify(data, null, 2);
     const blob = new Blob([jsonStr], { type: 'application/json' });

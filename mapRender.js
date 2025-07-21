@@ -218,4 +218,11 @@ function createConnections() {
 }
 
 window.createPeople = createPeople;
-window.createConnections = createConnections; 
+window.createConnections = createConnections;
+
+// Ensure refreshMap actually refreshes the vis-network
+window.refreshMap = function() {
+    if (typeof window.renderVisNetwork === 'function') {
+        window.renderVisNetwork();
+    }
+}; 

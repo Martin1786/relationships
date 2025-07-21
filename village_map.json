@@ -407,5 +407,7 @@
       "location": "Cyprus",
       "notes": ""
     }
-  ]
+  ],
+  "box_color": "#db0606",
+  "box_text_color": "#0b66c1"
 }

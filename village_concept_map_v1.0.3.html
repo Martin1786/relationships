@@ -180,22 +180,33 @@
             if (typeof APP_TITLE !== 'undefined') {
                 document.getElementById('appBarTitle').textContent = APP_TITLE;
             }
-            // Legend labels
-            document.getElementById('legendAllLabel').textContent = 'All';
-            document.getElementById('legendFamilyLabel').textContent = 'Family';
-            document.getElementById('legendWorkLabel').textContent = 'Work';
-            document.getElementById('legendSocialLabel').textContent = 'Social';
+            // Legend labels (with existence checks)
+            var legendAll = document.getElementById('legendAllLabel');
+            if (legendAll) legendAll.textContent = 'All';
+            var legendFamily = document.getElementById('legendFamilyLabel');
+            if (legendFamily) legendFamily.textContent = 'Family';
+            var legendWork = document.getElementById('legendWorkLabel');
+            if (legendWork) legendWork.textContent = 'Work';
+            var legendSocial = document.getElementById('legendSocialLabel');
+            if (legendSocial) legendSocial.textContent = 'Social';
             // Drawer button labels
-            if (typeof BUTTON_LABELS !== 'undefined') {
-                document.getElementById('drawerDownloadJsonBtn').textContent = BUTTON_LABELS.downloadJson;
-                document.getElementById('drawerAddRelationshipBtn').textContent = BUTTON_LABELS.addRelationship;
-                document.getElementById('drawerAddPersonBtn').textContent = BUTTON_LABELS.addPerson;
-                document.getElementById('drawerOpenDataEntryBtn').textContent = BUTTON_LABELS.openDataEntry;
-                document.getElementById('drawerResetDataBtn').textContent = BUTTON_LABELS.resetData;
-            }
+            // (Removed lines that set textContent for non-existent drawer button IDs)
             // Info panel instructions
-            if (typeof INSTRUCTIONS !== 'undefined') {
-                document.getElementById('infoPanel').innerHTML = '<strong>How to use:</strong> ' + INSTRUCTIONS.howToUse;
+            // (Removed line that set innerHTML for non-existent infoPanel)
+            // Set options form handler safely after DOM is loaded
+            var optionsForm = document.getElementById('optionsForm');
+            if (optionsForm) {
+                optionsForm.onsubmit = function(e) {
+                    e.preventDefault();
+                    window.BOX_COLOR = document.getElementById('boxColorInput').value;
+                    window.BOX_TEXT_COLOR = document.getElementById('boxTextColorInput').value;
+                    closeOptionsModal();
+                    window.renderVisNetwork();
+                    // Save color settings to JSON immediately
+                    if (typeof downloadMapAsJSON === 'function') {
+                        downloadMapAsJSON(window.people, window.connections);
+                    }
+                };
             }
         });
 
@@ -210,6 +221,7 @@
                     if (jsonData.people && jsonData.connections) {
                         window.people = [];
                         window.connections = [];
+                        // Set color variables BEFORE rendering
                         if (jsonData.box_color) window.BOX_COLOR = jsonData.box_color;
                         if (jsonData.box_text_color) window.BOX_TEXT_COLOR = jsonData.box_text_color;
                         jsonData.people.forEach(p => window.people.push({...p}));
@@ -251,6 +263,7 @@
                                 window.connections.push({...c});
                             }
                         });
+                        // Ensure colors are set before rendering
                         window.renderVisNetwork();
                         window.showUploadStatus('Loaded village_map.json successfully.', 'success');
                     } else {
@@ -485,14 +498,14 @@
                     label: p.name,
                     shape: 'box',
                     color: {
-                        background: (typeof BOX_COLOR !== 'undefined' ? BOX_COLOR : '#ffffff'),
+                        background: (typeof window.BOX_COLOR !== 'undefined' ? window.BOX_COLOR : '#ffffff'),
                         border: '#34495e',
                         highlight: {
-                            background: (typeof BOX_COLOR !== 'undefined' ? BOX_COLOR : '#ffffff'),
+                            background: (typeof window.BOX_COLOR !== 'undefined' ? window.BOX_COLOR : '#ffffff'),
                             border: '#1976d2'
                         }
                     },
-                    font: { size: 18, color: (typeof BOX_TEXT_COLOR !== 'undefined' ? BOX_TEXT_COLOR : '#2c3e50') }
+                    font: { size: 18, color: (typeof window.BOX_TEXT_COLOR !== 'undefined' ? window.BOX_TEXT_COLOR : '#2c3e50') }
                 });
                 // Role node (if present)
                 if (p.role) {
@@ -626,8 +639,8 @@
             const data = {
                 people: window.people,
                 connections: formattedConnections,
-                box_color: (typeof BOX_COLOR !== 'undefined' ? BOX_COLOR : '#ffffff'),
-                box_text_color: (typeof BOX_TEXT_COLOR !== 'undefined' ? BOX_TEXT_COLOR : '#2c3e50')
+                box_color: window.BOX_COLOR,
+                box_text_color: window.BOX_TEXT_COLOR
             };
             const jsonStr = JSON.stringify(data, null, 2);
             const blob = new Blob([jsonStr], { type: 'application/json' });
@@ -654,6 +667,7 @@
                         // Replace current data
                         people.length = 0;
                         connections.length = 0;
+                        // Set color variables BEFORE rendering
                         if (jsonData.box_color) window.BOX_COLOR = jsonData.box_color;
                         if (jsonData.box_text_color) window.BOX_TEXT_COLOR = jsonData.box_text_color;
                         jsonData.people.forEach(p => people.push({...p}));
@@ -696,6 +710,7 @@
                                 connections.push({...c});
                             }
                         });
+                        // Ensure colors are set before rendering
                         renderVisNetwork();
                         showUploadStatus('JSON file loaded successfully!', 'success');
                     } else {
@@ -780,13 +795,6 @@ function closeOptionsModal() {
 }
 window.openOptionsModal = openOptionsModal;
 window.closeOptionsModal = closeOptionsModal;
-document.getElementById('optionsForm').onsubmit = function(e) {
-    e.preventDefault();
-    window.BOX_COLOR = document.getElementById('boxColorInput').value;
-    window.BOX_TEXT_COLOR = document.getElementById('boxTextColorInput').value;
-    closeOptionsModal();
-    window.renderVisNetwork();
-};
     </script>
     <!-- Hidden file inputs for drawer upload buttons -->
     <input type="file" id="gedcomFile" accept=".ged" style="display: none;" onchange="handleGedcomUpload(event)">
